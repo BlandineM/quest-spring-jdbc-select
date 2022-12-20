@@ -66,5 +66,12 @@ public class SchoolController {
 
         return "school_get";
     }
+    @GetMapping("/school/delete")
+    public String deleteWizard(@RequestParam Long id) {
+
+        repository.deleteById(id);
+
+        return "redirect:/schools";
+    }
 
 }
