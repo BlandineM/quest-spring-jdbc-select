@@ -116,4 +116,46 @@ public class SchoolRepository {
 
         return null;
     }
+
+    public School save(String name, Long capacity, String country) {
+
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet generatedKeys = null;
+
+        try {
+            connection = DriverManager.getConnection(
+                    DB_URL, DB_USER, DB_PASSWORD
+            );
+            statement = connection.prepareStatement(
+                    "INSERT INTO school(name, capacity, country) VALUES (?, ?, ?)",
+                    statement.RETURN_GENERATED_KEYS
+            );
+            statement.setString(1, name);
+            statement.setLong(2, capacity);
+            statement.setString(3, country);
+
+            if (statement.executeUpdate() !=1){
+                throw new SQLException("Failed to insert data");
+            }
+
+            generatedKeys = statement.getGeneratedKeys();
+
+            if (generatedKeys.next()){
+                Long id = generatedKeys.getLong(1);
+                return new School(id, name, capacity, country);
+            } else {
+                throw new SQLException("Failed to get inssserted id");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            JdbcUtils.closeResultSet(generatedKeys);
+            JdbcUtils.closeStatement(statement);
+            JdbcUtils.closeConnection(connection);
+        }
+        return null;
+    }
+
 }
