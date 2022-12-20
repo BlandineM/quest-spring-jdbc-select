@@ -164,4 +164,38 @@ public class WizardRepository {
         }
         return null;
     }
+
+    public Wizard update(Long id, String firstName, String lastName, Date birthday,
+                         String birthPlace, String biography, boolean muggle) {
+
+        Connection connection = null;
+        PreparedStatement statement = null;
+        try {
+            connection = DriverManager.getConnection(
+                    DB_URL, DB_USER, DB_PASSWORD
+            );
+            statement = connection.prepareStatement(
+                    "UPDATE wizard SET first_name=?, last_name=?, birthday=?, birth_place=?, biography=?, is_muggle=? WHERE id=?"
+            );
+            statement.setString(1, firstName);
+            statement.setString(2, lastName);
+            statement.setDate(3, birthday);
+            statement.setString(4, birthPlace);
+            statement.setString(5, biography);
+            statement.setBoolean(6, muggle);
+            statement.setLong(7, id);
+
+            if (statement.executeUpdate() != 1) {
+                throw new SQLException("failed to update data");
+            }
+            return new Wizard(id, firstName, lastName, birthday,
+                    birthPlace, biography, muggle);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            JdbcUtils.closeStatement(statement);
+            JdbcUtils.closeConnection(connection);
+        }
+        return null;
+    }
 }
